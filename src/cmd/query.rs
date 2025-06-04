@@ -10,27 +10,34 @@ use crate::util::{self, Fzf, FzfChild};
 
 impl Run for Query {
     fn run(&self) -> Result<()> {
+        eprintln!("Run 1 {}", chrono::Local::now());
         let mut db = crate::db::Database::open()?;
+        eprintln!("Run 2 {}", chrono::Local::now());
         self.query(&mut db).and(db.save())
     }
 }
 
 impl Query {
     fn query(&self, db: &mut Database) -> Result<()> {
+        eprintln!("Query 1 {}", chrono::Local::now());
         let now = util::current_time()?;
         let mut stream = self.get_stream(db, now)?;
 
         if self.interactive {
+            eprintln!("Query 2 {}", chrono::Local::now());
             self.query_interactive(&mut stream, now)
         } else if self.list {
+            eprintln!("Query 3 {}", chrono::Local::now());
             self.query_list(&mut stream, now)
         } else {
+            eprintln!("Query 4 {}", chrono::Local::now());
             self.query_first(&mut stream, now)
         }
     }
 
     fn query_interactive(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
         let mut fzf = Self::get_fzf()?;
+        eprintln!("Query I 1 {}", chrono::Local::now());
         let selection = loop {
             match stream.next() {
                 Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => continue,
@@ -42,6 +49,7 @@ impl Query {
                 None => break fzf.wait()?,
             }
         };
+        eprintln!("Query I 2 {}", chrono::Local::now());
 
         if self.score {
             print!("{selection}");
@@ -49,6 +57,7 @@ impl Query {
             let path = selection.get(7..).context("could not read selection from fzf")?;
             print!("{path}");
         }
+        eprintln!("Query I 3 {}", chrono::Local::now());
         Ok(())
     }
 

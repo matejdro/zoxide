@@ -52,15 +52,20 @@ impl Database {
     }
 
     pub fn save(&mut self) -> Result<()> {
+        eprintln!("Save {}", chrono::Local::now());
         // Only write to disk if the database is modified.
         if !self.dirty() {
+            eprintln!("Not dirty {}", chrono::Local::now());
             return Ok(());
         }
 
         let bytes = Self::serialize(self.dirs())?;
+        eprintln!("Save 2 {}", chrono::Local::now());
         util::write(self.borrow_path(), bytes).context("could not write to database")?;
+        eprintln!("Save 3 {}", chrono::Local::now());
         self.with_dirty_mut(|dirty| *dirty = false);
 
+        eprintln!("Saved {}", chrono::Local::now());
         Ok(())
     }
 
