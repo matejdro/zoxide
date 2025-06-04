@@ -59,7 +59,10 @@ impl Database {
             return Ok(());
         }
 
-        let bytes = Self::serialize(self.dirs())?;
+        eprintln!("Save 1 {}", chrono::Local::now());
+        let dirs = self.dirs();
+        eprintln!("Save 1.5 {}", chrono::Local::now());
+        let bytes = Self::serialize(dirs)?;
         eprintln!("Save 2 {}", chrono::Local::now());
         util::write(self.borrow_path(), bytes).context("could not write to database")?;
         eprintln!("Save 3 {}", chrono::Local::now());
